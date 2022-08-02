@@ -1,0 +1,11 @@
+const path = require("path");
+
+module.exports = {
+    'config': path.resolve('./src/config', 'config.json'),
+    'migrations-path': path.resolve('./src', 'migrations'),
+    'models-path': path.resolve('./src', 'models'),
+    'seeders-path': path.resolve('./src', 'seeders')
+};
+//file nay de config node_modules/.bin/sequelize init
+// neu dung npx sequelize-cli init thi khong can dung file nay`
+// link dung sequelize-cli: https://sequelize.org/docs/v6/other-topics/migrations/#installing-the-cli

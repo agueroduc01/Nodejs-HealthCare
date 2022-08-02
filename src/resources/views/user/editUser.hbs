@@ -1,0 +1,29 @@
+<div class="container">
+    <div class="mt-4">
+        <div class="row">
+            <div class="col text-center">
+                <form action="/post-edit-user" method="POST">
+                    <div>
+                        <label for="">First Name</label><br>
+                        <input type="text" name="firstName" value="{{user.firstName}}" />
+                    </div>
+                    <div>
+                        <label for="">Last Name</label><br>
+                        <input type="text" name="lastName" value="{{user.lastName}}" />
+                    </div>
+                    <div>
+                        <label for="">Email</label><br>
+                        <input type="email" name="email" value="{{user.email}}" />
+                    </div>
+                    <div>
+                        <label for="">Address</label><br>
+                        <input type="text" name="address" value="{{user.address}}" />
+                    </div>
+                    <br>
+                    <input type="text" hidden value="{{user.id}}" name="id" />
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
