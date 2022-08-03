@@ -1,11 +1,12 @@
-import morgan from 'morgan';
-import express from 'express';
+import morgan from "morgan";
+import express from "express";
+import cors from "cors";
 
-import configViewEngine from './config/viewEngine';
-import initWebRouter from './routes/web';
-import db from './config/connectDB';
-import initAPIRouter from './routes/api';
-require('dotenv').config();
+import configViewEngine from "./config/viewEngine";
+import initWebRouter from "./routes/web";
+import db from "./config/connectDB";
+import initAPIRouter from "./routes/api";
+require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -17,9 +18,11 @@ const port = process.env.PORT || 8080;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+
 app.use((req, res, next) => {
-    next();
-})
+  next();
+});
 
 //Template Engine
 configViewEngine(app);
@@ -33,7 +36,9 @@ db.connection();
 
 // Middleware handle 404 not Found
 app.use((req, res, next) => {
-    return res.render('404notFound', {layout: false});
-})
+  return res.render("404notFound", { layout: false });
+});
 
-app.listen(port, () => console.log(`App listening at http://localhost:${port}`));
+app.listen(port, () =>
+  console.log(`App listening at http://localhost:${port}`)
+);

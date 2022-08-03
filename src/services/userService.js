@@ -10,8 +10,6 @@ let handleUserLogin = (email, password) => {
         // user already exists
         let user = await db.Users.findOne({
           where: { email },
-          //   attributes: ["email", "id", "password"],
-          raw: true,
         });
         if (user) {
           // compare password
@@ -59,6 +57,40 @@ let checkUserEmail = (userEmail) => {
   });
 };
 
+let getAllUsers = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let users = await db.Users.findAll({
+        nest: true,
+        attributes: {
+          exclude: ["password"],
+        },
+      });
+      resolve(users);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let getAUser = (idParam) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let id = idParam;
+      let user = await db.Users.findOne({
+        where: { id: id },
+        attributes: ["email", "id", "firstName", "lastName", "address"],
+        nest: true,
+      });
+      resolve(user);
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
+  getAllUsers,
+  getAUser,
 };

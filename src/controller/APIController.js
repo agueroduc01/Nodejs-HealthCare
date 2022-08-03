@@ -1,11 +1,30 @@
 import db from "../models/index";
 import userService from "../services/userService";
-import CRUDService from "../services/CRUDService";
 
 // api là 1 đường link
 // json => object
 let getAllUsers = async (req, res, next) => {
-  let data = await CRUDService.getAllUsers();
+  let data = await userService.getAllUsers();
+
+  return res.status(200).json({
+    message: "Duke",
+    errCode: 0,
+    data,
+  });
+};
+
+let getAUser = async (req, res, next) => {
+  let id = req.params.id;
+
+  // vì file index.js đã bắt middleware rồi nên ko cần validate ở đây nữa
+  //   if (!id) {
+  //     return res.status(200).json({
+  //       errCode: 1,
+  //       errMessage: "Missing required parameter",
+  //       user: {},
+  //     });
+  //   }
+  let data = await userService.getAUser(id);
 
   return res.status(200).json({
     message: "Duke",
@@ -102,6 +121,7 @@ let handleLogin = async (req, res) => {
 
 module.exports = {
   getAllUsers,
+  getAUser,
   createNewUser,
   updateUser,
   deleteUser,
