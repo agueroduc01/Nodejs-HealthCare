@@ -22,7 +22,16 @@ let getAboutPage = (req, res) => {
 };
 
 let getUserDetailPage = async (req, res) => {
-  let user = await CRUDService.getAUser(req.params.id);
+  let id = req.params.id;
+  // vì file index.js đã bắt middleware rồi nên ko cần validate ở đây nữa
+  // if (!id) {
+  //   return res.status(200).json({
+  //     errCode: 1,
+  //     errMessage: "Missing required parameter",
+  //     user: {},
+  //   });
+  // }
+  let user = await CRUDService.getAUser(id);
   // return res.send(JSON.stringify(user));
   return res.json({ user });
 };

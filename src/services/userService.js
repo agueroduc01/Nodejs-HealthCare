@@ -1,6 +1,8 @@
 import db from "../models/index";
 import bcrypt from "bcryptjs";
 
+const salt = bcrypt.genSaltSync(10);
+
 let handleUserLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -89,8 +91,133 @@ let getAUser = (idParam) => {
   });
 };
 
+let hashUserPassword = (password) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let hashPassword = await bcrypt.hashSync(password, salt);
+      resolve(hashPassword);
+    } catch (err) {
+      reject(err);
+    }
+  });
+};
+
+let createNewUser = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let {
+        firstName,
+        lastName,
+        email,
+        password,
+        address,
+        phoneNumber,
+        gender,
+        roleId,
+      } = data;
+      let check = await checkUserEmail(email);
+      if (check === true) {
+        resolve({
+          errCode: 1,
+          errMessage: "Your email address is already in use. Please try again!",
+        });
+      } else {
+        let hashPasswordFromBcrypt = await hashUserPassword(password);
+        await db.Users.create({
+          firstName,
+          lastName,
+          email,
+          password: hashPasswordFromBcrypt,
+          address,
+          phoneNumber,
+          gender: gender === "true" ? true : false,
+          roleId,
+        });
+        resolve({
+          errCode: 0,
+          errMessage: "Created a new user successfully",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let updateUser = (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let {
+        firstName,
+        lastName,
+        email,
+        address,
+        password,
+        phoneNumber,
+        gender,
+        roleId,
+        id,
+      } = data;
+      // (Update)
+      let user = await db.Users.update(
+        {
+          firstName,
+          lastName,
+          email,
+          address,
+          password,
+          phoneNumber,
+          gender,
+          roleId,
+        },
+        {
+          where: { id },
+          nest: true,
+        }
+      );
+      if (user[0] !== 0) {
+        resolve({
+          errCode: 0,
+          message: "Updated a user successfully!",
+        });
+      } else {
+        resolve({
+          errCode: 1,
+          message: "User not found!",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let deleteAUser = (idParam) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let id = idParam;
+      // Delete
+      let check = await db.Users.destroy({
+        where: {
+          id,
+        },
+      });
+      if (check === 1) {
+        resolve("Deleted a user successfully!");
+      } else {
+        resolve("Cannot find a user with id!");
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   getAllUsers,
   getAUser,
+  createNewUser,
+  updateUser,
+  deleteAUser,
 };

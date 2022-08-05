@@ -13,6 +13,7 @@ let createNewUser = async (data) => {
         password,
         address,
         phoneNumber,
+        gender,
         roleId,
       } = data;
       let hashPasswordFromBcrypt = await hashUserPassword(password);
@@ -23,7 +24,7 @@ let createNewUser = async (data) => {
         password: hashPasswordFromBcrypt,
         address,
         phoneNumber,
-        gender: data.gender === "1" ? true : false,
+        gender: gender === "1" ? true : false,
         roleId,
       });
       resolve("Created a new user successfully");

@@ -14,88 +14,107 @@ let getAllUsers = async (req, res, next) => {
 };
 
 let getAUser = async (req, res, next) => {
-  let id = req.params.id;
+  let id = req.query.id;
 
   // vì file index.js đã bắt middleware rồi nên ko cần validate ở đây nữa
-  //   if (!id) {
-  //     return res.status(200).json({
-  //       errCode: 1,
-  //       errMessage: "Missing required parameter",
-  //       user: {},
-  //     });
-  //   }
+  if (!id) {
+    return res.status(200).json({
+      errCode: 1,
+      errMessage: "Missing required parameter",
+      user: {},
+    });
+  }
   let data = await userService.getAUser(id);
 
   return res.status(200).json({
-    message: "Duke",
+    errCode: 0,
+    errMessage: "DukeUser",
     data,
   });
 };
 
-let createNewUser = async (req, res, next) => {
-  let { firstName, lastName, email, address } = req.body;
-
-  if (!firstName || !lastName || !email || !address) {
-    return res.status(200).json({
-      message: "Missing required parameters",
-    });
-  }
-
-  await db.Users.create({
+let handlecreateNewUser = async (req, res, next) => {
+  let {
     firstName,
     lastName,
     email,
     address,
-  });
+    password,
+    phoneNumber,
+    gender,
+    roleId,
+  } = req.body;
 
-  return res.status(200).json({
-    message: "OK",
-  });
-};
-
-let updateUser = async (req, res, next) => {
-  let { firstName, lastName, email, address, id } = req.body;
-  if (!firstName || !lastName || !email || !address || !id) {
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !address ||
+    !password ||
+    !phoneNumber ||
+    !gender ||
+    !roleId
+  ) {
     return res.status(200).json({
+      errCode: 1,
       message: "Missing required parameters",
     });
   }
 
-  // (Update)
-  let user = await db.Users.update(
-    {
-      firstName,
-      lastName,
-      email,
-      address,
-    },
-    {
-      where: { id },
-      raw: true,
-      nest: true,
-    }
-  );
-
+  let message = await userService.createNewUser(req.body);
   return res.status(200).json({
-    message: "OK",
+    message,
   });
 };
 
-let deleteUser = async (req, res, next) => {
-  let id = req.params.id;
+let handlePutUser = async (req, res, next) => {
+  let {
+    firstName,
+    lastName,
+    email,
+    address,
+    password,
+    phoneNumber,
+    gender,
+    roleId,
+    id,
+  } = req.body;
+  if (
+    !firstName ||
+    !lastName ||
+    !email ||
+    !address ||
+    !password ||
+    !phoneNumber ||
+    !gender ||
+    !roleId ||
+    !id
+  ) {
+    return res.status(200).json({
+      errCode: 1,
+      message: "Missing required parameters",
+    });
+  }
+
+  let message = await userService.updateUser(req.body);
+  return res.status(200).json({
+    message,
+  });
+};
+
+let handleDeleteAUser = async (req, res, next) => {
+  let id = req.body.id;
   if (!id) {
     return res.status(200).json({
+      errCode: 1,
       message: "Missing required parameters",
     });
   }
-  // (Delete)
-  await db.Users.destroy({
-    where: {
-      id,
-    },
-  });
+
+  let message = await userService.deleteAUser(id);
   return res.status(200).json({
-    message: "OK",
+    errCode: 0,
+    message,
   });
 };
 
@@ -122,8 +141,8 @@ let handleLogin = async (req, res) => {
 module.exports = {
   getAllUsers,
   getAUser,
-  createNewUser,
-  updateUser,
-  deleteUser,
+  handlecreateNewUser,
+  handlePutUser,
+  handleDeleteAUser,
   handleLogin,
 };
