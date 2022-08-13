@@ -147,25 +147,14 @@ let createNewUser = async (data) => {
 let updateUser = (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let {
-        firstName,
-        lastName,
-        email,
-        address,
-        password,
-        phoneNumber,
-        gender,
-        roleId,
-        id,
-      } = data;
+      let { firstName, lastName, address, phoneNumber, gender, roleId, id } =
+        data;
       // (Update)
       let user = await db.Users.update(
         {
           firstName,
           lastName,
-          email,
           address,
-          password,
           phoneNumber,
           gender,
           roleId,
@@ -213,6 +202,29 @@ let deleteAUser = (idParam) => {
   });
 };
 
+let getAllCodeService = (type) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (!type) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameters!",
+        });
+      } else {
+        let res = {};
+        let allcode = await db.Allcode.findAll({
+          where: { type },
+        });
+        res.errCode = 0;
+        res.data = allcode;
+        resolve(res);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   handleUserLogin,
   getAllUsers,
@@ -220,4 +232,5 @@ module.exports = {
   createNewUser,
   updateUser,
   deleteAUser,
+  getAllCodeService,
 };

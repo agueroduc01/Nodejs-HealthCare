@@ -68,23 +68,13 @@ let handlecreateNewUser = async (req, res, next) => {
 };
 
 let handlePutUser = async (req, res, next) => {
-  let {
-    firstName,
-    lastName,
-    email,
-    address,
-    password,
-    phoneNumber,
-    gender,
-    roleId,
-    id,
-  } = req.body;
+  let { firstName, lastName, email, address, phoneNumber, gender, roleId, id } =
+    req.body;
   if (
     !firstName ||
     !lastName ||
     !email ||
     !address ||
-    !password ||
     !phoneNumber ||
     !gender ||
     !roleId ||
@@ -138,6 +128,19 @@ let handleLogin = async (req, res) => {
   });
 };
 
+let handleGetAllCode = async (req, res) => {
+  try {
+    let data = await userService.getAllCodeService(req.query.type);
+    return res.status(200).json(data);
+  } catch (error) {
+    console.error(">>Get all code server error: ", error);
+    return res.status(200).json({
+      errCode: -1,
+      errMessage: "Error from server",
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getAUser,
@@ -145,4 +148,5 @@ module.exports = {
   handlePutUser,
   handleDeleteAUser,
   handleLogin,
+  handleGetAllCode,
 };

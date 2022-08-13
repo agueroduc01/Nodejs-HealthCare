@@ -12,6 +12,8 @@ const initAPIRouter = (app) => {
 
   router.post("/login", APIController.handleLogin); // method POST ->
 
+  router.get("/allcode", APIController.handleGetAllCode); // method GET ->
+
   return app.use("/api/v1/", router);
 };
 
