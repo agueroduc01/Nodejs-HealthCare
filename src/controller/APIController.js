@@ -1,5 +1,6 @@
 import db from "../models/index";
 import userService from "../services/userService";
+import { createJWT } from "../middleware/JWTAction";
 
 // api là 1 đường link
 // json => object
@@ -111,20 +112,35 @@ let handleDeleteAUser = async (req, res, next) => {
 let handleLogin = async (req, res) => {
   let { email, password } = req.body;
   if (!email || !password) {
-    return res.status(500).json({
+    return res.status(200).json({
       errCode: 1,
       message: "Missing inputs parameters",
     });
   }
   let userData = await userService.handleUserLogin(email, password);
-  // check email exist
-  // compare password
-  // return userInfo
-  // access token: JWT
+  /**
+   * Authentication(xác thực):
+   * - check email exist
+   * - compare password
+   * - return userInfo
+   */
+  // Authorization(ủy quyền) : access token: JWT
+  let token = null;
+  if (userData && userData.errCode === 0 && userData.errMessage === "ok") {
+    let payload = {
+      id: `${userData.user.id}`,
+      name: `${userData.user.firstName} ${userData.user.lastName}`,
+      address: `${userData.user.address}`,
+      roleId: `${userData.user.roleId}`,
+    };
+    token = createJWT(payload);
+  }
+
   return res.status(200).json({
     errCode: userData.errCode,
     message: userData.errMessage,
     user: userData.user ? userData.user : {},
+    token,
   });
 };
 

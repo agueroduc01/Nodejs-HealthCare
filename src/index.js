@@ -11,6 +11,10 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 8080;
 
+// Configure to get cookies (req.cookies.token)
+import cookieParser from "cookie-parser";
+app.use(cookieParser());
+
 // HTTP logger (middleware)
 // app.use(morgan('combined'));
 
