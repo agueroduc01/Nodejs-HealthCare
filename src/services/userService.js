@@ -114,6 +114,8 @@ let createNewUser = async (data) => {
         phoneNumber,
         gender,
         roleId,
+        positionId,
+        image,
       } = data;
       let check = await checkUserEmail(email);
       if (check === true) {
@@ -130,8 +132,10 @@ let createNewUser = async (data) => {
           password: hashPasswordFromBcrypt,
           address,
           phoneNumber,
-          gender: gender === "true" ? true : false,
+          gender,
           roleId,
+          positionId,
+          image: image ? image : null,
         });
         resolve({
           errCode: 0,

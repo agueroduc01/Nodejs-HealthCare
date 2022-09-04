@@ -1,6 +1,12 @@
 import db from "../models/index";
 import userService from "../services/userService";
-import { createJWT } from "../middleware/JWTAction";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../middleware/JWTAction";
+
+let refreshTokens = [];
 
 // api là 1 đường link
 // json => object
@@ -125,7 +131,8 @@ let handleLogin = async (req, res) => {
    * - return userInfo
    */
   // Authorization(ủy quyền) : access token: JWT
-  let token = null;
+  let accessToken = null;
+  let refreshToken = null;
   if (userData && userData.errCode === 0 && userData.errMessage === "ok") {
     let payload = {
       id: `${userData.user.id}`,
@@ -133,14 +140,20 @@ let handleLogin = async (req, res) => {
       address: `${userData.user.address}`,
       roleId: `${userData.user.roleId}`,
     };
-    token = createJWT(payload);
+    accessToken = generateAccessToken(payload);
+    refreshToken = generateRefreshToken(payload);
+    refreshTokens.push(refreshToken);
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      sameSite: "strict",
+    });
   }
-
   return res.status(200).json({
     errCode: userData.errCode,
     message: userData.errMessage,
-    user: userData.user ? userData.user : {},
-    token,
+    user: userData.user ? { ...userData.user, accessToken } : {},
   });
 };
 
@@ -157,6 +170,48 @@ let handleGetAllCode = async (req, res) => {
   }
 };
 
+// Thường dùng REDIS để lưu refreshToken
+let requestRefreshToken = async (req, res) => {
+  // Take refreshToken from user
+  let refreshToken = req.cookies.refreshToken;
+  if (!refreshToken)
+    return res.sendStatus(401).json("You're not authenticated");
+  if (!refreshTokens.includes(refreshToken))
+    return res.sendStatus(403).json("Refresh token is not available");
+  try {
+    let data = verifyRefreshToken(refreshToken);
+    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    data = {
+      id: data.id,
+      name: data.name,
+      address: data.address,
+      roleId: data.roleId,
+    };
+    let newAccessToken = generateAccessToken(data);
+    let newRefreshToken = generateRefreshToken(data);
+    refreshTokens.push(newRefreshToken);
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      path: "/",
+      sameSite: "strict",
+    });
+    return res.status(200).json({
+      accessToken: newAccessToken,
+    });
+  } catch (error) {
+    return res.sendStatus(403).json("NOT FORBIDDEN!");
+  }
+};
+
+let handleLogout = async (req, res) => {
+  res.clearCookie("refreshToken");
+  refreshTokens = refreshTokens.filter(
+    (token) => token !== req.cookies.refreshToken
+  );
+  return res.status(200).json("Logged out !");
+};
+
 module.exports = {
   getAllUsers,
   getAUser,
@@ -165,4 +220,6 @@ module.exports = {
   handleDeleteAUser,
   handleLogin,
   handleGetAllCode,
+  requestRefreshToken,
+  handleLogout,
 };

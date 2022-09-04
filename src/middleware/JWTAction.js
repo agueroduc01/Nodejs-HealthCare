@@ -1,14 +1,12 @@
 import jwt from "jsonwebtoken";
 require("dotenv").config();
 
-const createJWT = (payload) => {
+const generateAccessToken = (payload) => {
   let accessToken = null;
-  let refreshToken = null;
   try {
     accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "3600s",
     });
-    refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET);
     console.log("createJWT from JWTACtion", accessToken, payload);
   } catch (e) {
     console.log("Loi createJWT: ", e);
@@ -16,10 +14,22 @@ const createJWT = (payload) => {
   return accessToken;
 };
 
-const verifyToken = (token) => {
+const generateRefreshToken = (payload) => {
+  let refreshToken = null;
+  try {
+    refreshToken = jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: "30d",
+    });
+  } catch (e) {
+    console.log("Loi refreshToken: ", e);
+  }
+  return refreshToken;
+};
+
+const verifyRefreshToken = (token) => {
   let data = null;
   try {
-    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     data = decoded;
   } catch (error) {
     console.log(error);
@@ -28,13 +38,13 @@ const verifyToken = (token) => {
 };
 
 let checkLogin = (req, res, next) => {
-  // const authorizationHeader = req.headers["authorization"];
   // 'Bearer [token]'
-  // const token = authorizationHeader.split(" ")[1];
-  const token = req.cookies.token;
+  const authorizationHeader = req.headers["authorization"];
+  const token =
+    authorizationHeader.split(" ")[1] || req.body.token || req.query.token;
   if (!token)
-    // res.status(401).json({
-    res.status(200).json({
+    res.status(401).json({
+      // res.status(200).json({
       error: `Authentication error. Token required.`,
       status: 401,
     }); // unauthorizeError
@@ -98,8 +108,9 @@ let checkAdmin = (req, res, next) => {
 };
 
 module.exports = {
-  createJWT,
-  verifyToken,
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
   checkLogin,
   checkPatient,
   checkDoctor,
