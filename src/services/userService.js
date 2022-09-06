@@ -159,6 +159,7 @@ let updateUser = (data) => {
         gender,
         roleId,
         positionId,
+        image,
         id,
       } = data;
       if (
@@ -169,9 +170,10 @@ let updateUser = (data) => {
         !gender ||
         !roleId ||
         !positionId ||
+        !image ||
         !id
       ) {
-        resolve({
+        return resolve({
           errCode: 2,
           errMessage: "Missing required parameter",
         });
@@ -186,6 +188,7 @@ let updateUser = (data) => {
           gender,
           roleId,
           positionId,
+          image,
         },
         {
           where: { id },
@@ -193,12 +196,12 @@ let updateUser = (data) => {
         }
       );
       if (user[0] !== 0) {
-        resolve({
+        return resolve({
           errCode: 0,
           errMessage: "Updated a user successfully!",
         });
       } else {
-        resolve({
+        return resolve({
           errCode: 1,
           errMessage: "User not found!",
         });
