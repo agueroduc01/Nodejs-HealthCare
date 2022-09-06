@@ -50,21 +50,21 @@ let handlecreateNewUser = async (req, res, next) => {
     phoneNumber,
     gender,
     roleId,
+    positionId,
   } = req.body;
-
   if (
     !firstName ||
     !lastName ||
     !email ||
-    !address ||
     !password ||
+    !address ||
     !phoneNumber ||
     !gender ||
+    !positionId ||
     !roleId
   ) {
     return res.status(200).json({
-      errCode: 1,
-      message: "Missing required parameters",
+      message: { errCode: 1, errMessage: "Missing required parameters" },
     });
   }
 
@@ -75,12 +75,20 @@ let handlecreateNewUser = async (req, res, next) => {
 };
 
 let handlePutUser = async (req, res, next) => {
-  let { firstName, lastName, email, address, phoneNumber, gender, roleId, id } =
-    req.body;
+  let {
+    firstName,
+    lastName,
+    positionId,
+    address,
+    phoneNumber,
+    gender,
+    roleId,
+    id,
+  } = req.body;
   if (
     !firstName ||
     !lastName ||
-    !email ||
+    !positionId ||
     !address ||
     !phoneNumber ||
     !gender ||
@@ -88,8 +96,7 @@ let handlePutUser = async (req, res, next) => {
     !id
   ) {
     return res.status(200).json({
-      errCode: 1,
-      message: "Missing required parameters",
+      message: { errCode: 1, errMessage: "Missing required parameters" },
     });
   }
 
