@@ -1,5 +1,6 @@
 import express from "express";
 import APIController from "../controller/APIController";
+import APIDoctorController from "../controller/APIDoctorController";
 import {
   checkLogin,
   checkPatient,
@@ -22,6 +23,9 @@ const initAPIRouter = (app) => {
   router.post("/refreshToken", APIController.requestRefreshToken);
 
   router.get("/allcode", APIController.handleGetAllCode); // method GET ->
+
+  // Our doctors
+  router.get("/doctor-home", APIDoctorController.handleGetDoctorHome); // method GET ->handleGetDoctorHome
 
   return app.use("/api/v1/", router);
 };
