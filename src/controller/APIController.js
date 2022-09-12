@@ -160,7 +160,7 @@ let handleLogin = async (req, res) => {
   return res.status(200).json({
     errCode: userData.errCode,
     message: userData.errMessage,
-    user: userData.user ? { ...userData.user, accessToken } : {},
+    user: userData.user ? { ...userData.user, image: null, accessToken } : {},
   });
 };
 
@@ -181,10 +181,9 @@ let handleGetAllCode = async (req, res) => {
 let requestRefreshToken = async (req, res) => {
   // Take refreshToken from user
   let refreshToken = req.cookies.refreshToken;
-  if (!refreshToken)
-    return res.sendStatus(401).json("You're not authenticated");
+  if (!refreshToken) return res.status(401).json("You're not authenticated");
   if (!refreshTokens.includes(refreshToken))
-    return res.sendStatus(403).json("Refresh token is not available");
+    return res.status(403).json("Refresh token is not available");
   try {
     let data = verifyRefreshToken(refreshToken);
     refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
@@ -207,7 +206,7 @@ let requestRefreshToken = async (req, res) => {
       accessToken: newAccessToken,
     });
   } catch (error) {
-    return res.sendStatus(403).json("NOT FORBIDDEN!");
+    return res.status(403).json("NOT FORBIDDEN!");
   }
 };
 

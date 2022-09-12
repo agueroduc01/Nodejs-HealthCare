@@ -5,7 +5,7 @@ const generateAccessToken = (payload) => {
   let accessToken = null;
   try {
     accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "3600s",
+      expiresIn: "15s",
     });
     console.log("createJWT from JWTACtion", accessToken, payload);
   } catch (e) {
@@ -45,8 +45,8 @@ let checkLogin = (req, res, next) => {
   if (!token)
     res.status(401).json({
       // res.status(200).json({
-      error: `Authentication error. Token required.`,
-      status: 401,
+      errMessage: `Authentication error. Token required.`,
+      errCode: 401,
     }); // unauthorizeError
   let decodedData = null;
   try {
@@ -55,11 +55,19 @@ let checkLogin = (req, res, next) => {
     console.log("req.decodedData from checklogin", req.decodedData);
     next();
   } catch (error) {
-    console.log(error);
-    // return res.status(403).json('ban khong co quyen vao route nay'); // forbiden(ko có quyền truy xuất vào route hiện tại)
-    return res.status(500).json({
-      message: "Something wrong with verification",
-    });
+    console.log("check login error", error.message);
+    if (error.name === "TokenExpiredError") {
+      return res.status(200).json({
+        errCode: 401,
+        errMessage: error.message,
+        token: token,
+      });
+    } else {
+      return res.status(500).json({
+        errCode: 500,
+        errMessage: "Something wrong with verification",
+      });
+    }
   }
 };
 
@@ -68,6 +76,7 @@ let checkPatient = (req, res, next) => {
   if (role === "R3" || role === "R2" || role === "R1") {
     next();
   } else {
+    // return res.status(403).json('ban khong co quyen vao route nay'); // forbiden(ko có quyền truy xuất vào route hiện tại)
     return res.status(403).json({
       message: "NOT PERMISSION",
       status: "403 Forbidden",
