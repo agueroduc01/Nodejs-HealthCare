@@ -34,6 +34,116 @@ let getDoctorHome = (limit) => {
     }
   });
 };
+
+let getAllDoctors = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let doctors = await db.Users.findAll({
+        where: {
+          roleId: "R2",
+        },
+        attributes: {
+          exclude: ["password", "image"],
+        },
+      });
+      resolve({
+        errCode: 0,
+        doctors,
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let getDetailDoctorById = (doctorId) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // error boundary
+      if (!doctorId) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        let data = await db.Users.findOne({
+          where: {
+            id: doctorId,
+          },
+          attributes: {
+            exclude: ["password"],
+          },
+          include: [
+            {
+              model: db.Markdown,
+              attributes: ["description", "contentHTML", "contentMarkdown"],
+            },
+            {
+              model: db.Allcode,
+              as: "positionData",
+              attributes: ["valueEn", "valueVi"],
+            },
+          ],
+          raw: false,
+          nest: true,
+        });
+        if (data && data.image) {
+          // decode image tu kieu du lieu BLOB, chuyen sang base64
+          data.image = Buffer.from(data.image, "base64").toString("binary");
+        }
+        //set object rong de server ko die
+        if (!data) data = {};
+        resolve({
+          errCode: 0,
+          data,
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+let saveDetailInforDoctor = (inputData) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      if (
+        !inputData.doctorId ||
+        !inputData.contentHTML ||
+        !inputData.contentMarkdown
+      ) {
+        resolve({
+          errCode: 1,
+          errMessage: "Missing required parameter",
+        });
+      } else {
+        // vì theo mô hình mình làm là 1 bác sĩ chỉ có 1 bài đăng nên ko dùng create mà dùng update
+        await db.Markdown.update(
+          {
+            contentHTML: inputData.contentHTML,
+            contentMarkdown: inputData.contentMarkdown,
+            description: inputData.description,
+          },
+          {
+            where: { doctorId: inputData.doctorId },
+            nest: true,
+            raw: true,
+          }
+        );
+        resolve({
+          errCode: 0,
+          errMessage: "Save information doctor succeed",
+        });
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
 module.exports = {
   getDoctorHome,
+  getAllDoctors,
+  getDetailDoctorById,
+  saveDetailInforDoctor,
 };

@@ -40,8 +40,16 @@ const verifyRefreshToken = (token) => {
 let checkLogin = (req, res, next) => {
   // 'Bearer [token]'
   const authorizationHeader = req.headers["authorization"];
-  const token =
-    authorizationHeader.split(" ")[1] || req.body.token || req.query.token;
+  let token = null;
+  if (authorizationHeader.indexOf(",") < 0) {
+    token =
+      authorizationHeader.split(" ")[1] || req.body.token || req.query.token;
+  } else {
+    token =
+      authorizationHeader.split(",")[1].split(" ")[2] ||
+      req.body.token ||
+      req.query.token;
+  }
   if (!token)
     res.status(401).json({
       // res.status(200).json({

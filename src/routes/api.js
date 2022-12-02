@@ -26,6 +26,10 @@ const initAPIRouter = (app) => {
 
   // Our doctors
   router.get("/doctor-home", APIDoctorController.handleGetDoctorHome); // method GET ->handleGetDoctorHome
+  // router.get("/doctor-markdown", APIDoctorrController.handleGetDoctorMarkdown); // method GET ->handleGetDoctorMarkdown
+  router.get("/get-all-doctors", APIDoctorController.handleGetAllDoctors); // method
+  router.post("/save-infor-doctors", APIDoctorController.postInforDoctor); // method
+  router.get("/get-detail-doctor", APIDoctorController.getDetailDoctor); // method
 
   return app.use("/api/v1/", router);
 };

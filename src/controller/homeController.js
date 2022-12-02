@@ -1,5 +1,4 @@
 import db from "../models/index";
-import { multipleToObject } from "../ulti/convertToObject";
 import multer from "multer";
 import CRUDService from "../services/CRUDService";
 

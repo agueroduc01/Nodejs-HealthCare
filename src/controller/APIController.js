@@ -6,8 +6,6 @@ import {
   verifyRefreshToken,
 } from "../middleware/JWTAction";
 
-let refreshTokens = [];
-
 // api là 1 đường link
 // json => object
 let getAllUsers = async (req, res, next) => {
@@ -149,7 +147,8 @@ let handleLogin = async (req, res) => {
     };
     accessToken = generateAccessToken(payload);
     refreshToken = generateRefreshToken(payload);
-    refreshTokens.push(refreshToken);
+
+    // Nếu dùng REDIS thì bỏ res.cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: false,
@@ -182,11 +181,13 @@ let requestRefreshToken = async (req, res) => {
   // Take refreshToken from user
   let refreshToken = req.cookies.refreshToken;
   if (!refreshToken) return res.status(401).json("You're not authenticated");
-  if (!refreshTokens.includes(refreshToken))
-    return res.status(403).json("Refresh token is not available");
+  // Kiểm tra trong REDIS nếu không có refreshToken thì báo lỗi
+  // if (!refreshTokens.includes(refreshToken))
+  //   return res.status(403).json("Refresh token is not available");
   try {
     let data = verifyRefreshToken(refreshToken);
-    refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+    // Lọc (loại bỏ) refreshToken trong REDIS mà user vừa gửi request đến
+    // refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
     data = {
       id: data.id,
       name: data.name,
@@ -195,7 +196,8 @@ let requestRefreshToken = async (req, res) => {
     };
     let newAccessToken = generateAccessToken(data);
     let newRefreshToken = generateRefreshToken(data);
-    refreshTokens.push(newRefreshToken);
+    // Thêm refreshToken mới vào REDIS
+    // refreshTokens.push(newRefreshToken);
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
       secure: false,
@@ -211,11 +213,33 @@ let requestRefreshToken = async (req, res) => {
 };
 
 let handleLogout = async (req, res) => {
-  res.clearCookie("refreshToken");
-  refreshTokens = refreshTokens.filter(
-    (token) => token !== req.cookies.refreshToken
-  );
-  return res.status(200).json("Logged out !");
+  try {
+    // Lọc (loại bỏ) refreshToken trong REDIS mà user vừa gửi request đến
+    res.clearCookie("refreshToken");
+    // const { refreshToken } = req.body;
+    // if (!refreshToken) return res.status(401).json("You're not authenticated");
+    // const data = verifyRefreshToken(refreshToken);
+    // data = {
+    //   id: data.id,
+    //   name: data.name,
+    //   address: data.address,
+    //   roleId: data.roleId,
+    // };
+    // client.del(data.toString(), (err, reply) => {
+    // if (err) {
+    // return res.status(500).json({
+    // errMessage: "Error from server (log out)"
+    // })
+    // }
+    // return res.status(200).json({
+    // errMessage: "Logout!"
+    // })
+    // })
+    return res.status(200).json("Logged out !");
+  } catch (error) {
+    console.log("error from logged out", error);
+    return res.status(500).json(`${error.message}`);
+  }
 };
 
 module.exports = {
