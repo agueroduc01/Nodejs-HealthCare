@@ -27,6 +27,7 @@ app.use(
     credentials: true,
     origin: process.env.URL_REACT,
     allowedHeaders: ["X-Requested-With"],
+    "Content-Type": "application/json",
   })
 );
 
