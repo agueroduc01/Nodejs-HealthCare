@@ -20,9 +20,9 @@
     },
     "production": {
         "username": "root",
-        "password": "123456",
-        "database": "bookingcare",
-        "host": "0.0.0.0",
+        "password": "MzrAyVlzD3Mz5Gjcmb0g",
+        "database": "railway",
+        "host": "containers-us-west-175.railway.app",
         "dialect": "mysql",
         "logging": false,
         "query": {

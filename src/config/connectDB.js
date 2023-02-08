@@ -8,6 +8,16 @@ const sequelize = new Sequelize("bookingcare", "root", "123456", {
   logging: false,
 });
 
+// const sequelize = new Sequelize({
+//   username: "root",
+//   password: "123456",
+//   database: "",
+//   dialect: "mysql",
+//   port: "",
+//   host: "",
+//   logging: false,
+// });
+
 let connection = async () => {
   try {
     await sequelize.authenticate();
