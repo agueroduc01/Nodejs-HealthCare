@@ -25,6 +25,7 @@
         "host": "containers-us-west-175.railway.app",
         "dialect": "mysql",
         "logging": false,
+        "port": 7107,
         "query": {
             "raw": true
         },
