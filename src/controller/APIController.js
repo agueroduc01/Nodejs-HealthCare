@@ -150,12 +150,6 @@ let handleLogin = async (req, res) => {
     refreshToken = generateRefreshToken(payload);
 
     // Nếu dùng REDIS thì bỏ res.cookie
-    // res.cookie("refreshToken", refreshToken, {
-    //   httpOnly: true,
-    //   path: "/",
-    //   secure: process.env.NODE_ENV === "production",
-    //   sameSite: "strict",
-    // });
     return res
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -209,15 +203,19 @@ let requestRefreshToken = async (req, res) => {
     let newRefreshToken = generateRefreshToken(data);
     // Thêm refreshToken mới vào REDIS
     // refreshTokens.push(newRefreshToken);
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: false,
-      path: "/",
-      sameSite: "strict",
-    });
-    return res.status(200).json({
-      accessToken: newAccessToken,
-    });
+    res;
+    return res
+      .cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        // secure: false,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        sameSite: "none",
+      })
+      .status(200)
+      .json({
+        accessToken: newAccessToken,
+      });
   } catch (error) {
     return res.status(403).json("NOT FORBIDDEN!");
   }
