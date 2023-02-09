@@ -150,22 +150,18 @@ let handleLogin = async (req, res) => {
     refreshToken = generateRefreshToken(payload);
 
     // Nếu dùng REDIS thì bỏ res.cookie
-    return res
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-      })
-      .status(200)
-      .json({
-        errCode: userData.errCode,
-        message: userData.errMessage,
-        user: userData.user
-          ? { ...userData.user, image: null, accessToken }
-          : {},
-      });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      path: "/",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+    });
   }
+  return res.status(200).json({
+    errCode: userData.errCode,
+    message: userData.errMessage,
+    user: userData.user ? { ...userData.user, image: null, accessToken } : {},
+  });
 };
 
 let handleGetAllCode = async (req, res) => {
@@ -203,7 +199,6 @@ let requestRefreshToken = async (req, res) => {
     let newRefreshToken = generateRefreshToken(data);
     // Thêm refreshToken mới vào REDIS
     // refreshTokens.push(newRefreshToken);
-    res;
     return res
       .cookie("refreshToken", newRefreshToken, {
         httpOnly: true,
