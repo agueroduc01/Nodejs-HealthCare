@@ -151,9 +151,9 @@ let handleLogin = async (req, res) => {
     // Nếu dùng REDIS thì bỏ res.cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: false,
       path: "/",
-      sameSite: "strict",
+      // secure: false,
+      // sameSite: "strict",
     });
   }
   return res.status(200).json({
