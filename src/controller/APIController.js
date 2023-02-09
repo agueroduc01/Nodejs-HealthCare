@@ -160,8 +160,8 @@ let handleLogin = async (req, res) => {
       .cookie("refreshToken", refreshToken, {
         httpOnly: true,
         path: "/",
-        secure: process.env.NODE_ENV === "production",
-        // sameSite: "strict",
+        secure: false,
+        sameSite: "none",
       })
       .status(200)
       .json({
