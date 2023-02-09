@@ -161,7 +161,7 @@ let handleLogin = async (req, res) => {
         httpOnly: true,
         path: "/",
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        // sameSite: "strict",
       })
       .status(200)
       .json({
