@@ -5,6 +5,7 @@ import {
   generateRefreshToken,
   verifyRefreshToken,
 } from "../middleware/JWTAction";
+require("dotenv").config();
 
 // api là 1 đường link
 // json => object
@@ -149,18 +150,28 @@ let handleLogin = async (req, res) => {
     refreshToken = generateRefreshToken(payload);
 
     // Nếu dùng REDIS thì bỏ res.cookie
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      path: "/",
-      // secure: false,
-      // sameSite: "strict",
-    });
+    // res.cookie("refreshToken", refreshToken, {
+    //   httpOnly: true,
+    //   path: "/",
+    //   secure: process.env.NODE_ENV === "production",
+    //   sameSite: "strict",
+    // });
+    return res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      })
+      .status(200)
+      .json({
+        errCode: userData.errCode,
+        message: userData.errMessage,
+        user: userData.user
+          ? { ...userData.user, image: null, accessToken }
+          : {},
+      });
   }
-  return res.status(200).json({
-    errCode: userData.errCode,
-    message: userData.errMessage,
-    user: userData.user ? { ...userData.user, image: null, accessToken } : {},
-  });
 };
 
 let handleGetAllCode = async (req, res) => {
