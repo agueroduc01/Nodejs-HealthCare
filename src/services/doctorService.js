@@ -1,25 +1,25 @@
-import db from "../models/index";
+import db from '../models/index';
 
 let getDoctorHome = (limit) => {
   return new Promise(async (resolve, reject) => {
     try {
       let users = await db.Users.findAll({
         limit,
-        order: [["createdAt", "DESC"]],
+        order: [['createdAt', 'DESC']],
         attributes: {
-          exclude: ["password"],
+          exclude: ['password'],
         },
-        where: { roleId: "R2" },
+        where: { roleId: 'R2' },
         include: [
           {
             model: db.Allcode,
-            as: "positionData",
-            attributes: ["valueEn", "valueVi"],
+            as: 'positionData',
+            attributes: ['valueEn', 'valueVi'],
           },
           {
             model: db.Allcode,
-            as: "genderData",
-            attributes: ["valueEn", "valueVi"],
+            as: 'genderData',
+            attributes: ['valueEn', 'valueVi'],
           },
         ],
         raw: true,
@@ -40,10 +40,10 @@ let getAllDoctors = () => {
     try {
       let doctors = await db.Users.findAll({
         where: {
-          roleId: "R2",
+          roleId: 'R2',
         },
         attributes: {
-          exclude: ["password", "image"],
+          exclude: ['password', 'image'],
         },
       });
       resolve({
@@ -63,7 +63,7 @@ let getDetailDoctorById = (doctorId) => {
       if (!doctorId) {
         resolve({
           errCode: 1,
-          errMessage: "Missing required parameter",
+          errMessage: 'Missing required parameter',
         });
       } else {
         let data = await db.Users.findOne({
@@ -71,17 +71,17 @@ let getDetailDoctorById = (doctorId) => {
             id: doctorId,
           },
           attributes: {
-            exclude: ["password"],
+            exclude: ['password'],
           },
           include: [
             {
               model: db.Markdown,
-              attributes: ["description", "contentHTML", "contentMarkdown"],
+              attributes: ['description', 'contentHTML', 'contentMarkdown'],
             },
             {
               model: db.Allcode,
-              as: "positionData",
-              attributes: ["valueEn", "valueVi"],
+              as: 'positionData',
+              attributes: ['valueEn', 'valueVi'],
             },
           ],
           raw: false,
@@ -89,7 +89,7 @@ let getDetailDoctorById = (doctorId) => {
         });
         if (data && data.image) {
           // decode image tu kieu du lieu BLOB, chuyen sang base64
-          data.image = Buffer.from(data.image, "base64").toString("binary");
+          data.image = Buffer.from(data.image, 'base64').toString('binary');
         }
         //set object rong de server ko die
         if (!data) data = {};
@@ -114,26 +114,51 @@ let saveDetailInforDoctor = (inputData) => {
       ) {
         resolve({
           errCode: 1,
-          errMessage: "Missing required parameter",
+          errMessage: 'Missing required parameter',
         });
       } else {
-        // vì theo mô hình mình làm là 1 bác sĩ chỉ có 1 bài đăng nên ko dùng create mà dùng update
-        await db.Markdown.update(
-          {
-            contentHTML: inputData.contentHTML,
-            contentMarkdown: inputData.contentMarkdown,
-            description: inputData.description,
+        let doctorId = inputData.doctorId;
+        let checkMarkdown = await db.Markdown.findOne({
+          where: {
+            doctorId,
           },
-          {
-            where: { doctorId: inputData.doctorId },
-            nest: true,
-            raw: true,
-          }
-        );
-        resolve({
-          errCode: 0,
-          errMessage: "Save information doctor succeed",
         });
+        if (checkMarkdown) {
+          await db.Markdown.update(
+            {
+              contentHTML: inputData.contentHTML,
+              contentMarkdown: inputData.contentMarkdown,
+              description: inputData.description,
+              doctorId,
+            },
+            {
+              where: { id: checkMarkdown.id },
+              nest: true,
+              raw: true,
+            }
+          );
+          return resolve({
+            errCode: 0,
+            errMessage: 'Edit information doctor succeed',
+          });
+        } else {
+          await db.Markdown.create(
+            {
+              contentHTML: inputData.contentHTML,
+              contentMarkdown: inputData.contentMarkdown,
+              description: inputData.description,
+              doctorId,
+            },
+            {
+              nest: true,
+              raw: true,
+            }
+          );
+          return resolve({
+            errCode: 0,
+            errMessage: 'Save information doctor succeed',
+          });
+        }
       }
     } catch (error) {
       reject(error);

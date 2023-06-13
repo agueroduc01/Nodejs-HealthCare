@@ -1,9 +1,11 @@
 import bcrypt from "bcryptjs";
 import db from "../models/index";
+import UserDTO from "../DTO/UserDTO";
 
 const salt = bcrypt.genSaltSync(10);
 
 let createNewUser = async (data) => {
+  // const data = new UserDTO(data);
   return new Promise(async (resolve, reject) => {
     try {
       let {

@@ -6,6 +6,7 @@ import {
   verifyRefreshToken,
 } from "../middleware/JWTAction";
 require("dotenv").config();
+import { authSchema } from "../ulti/validation_schema";
 
 // api là 1 đường link
 // json => object
@@ -51,21 +52,39 @@ let handlecreateNewUser = async (req, res, next) => {
     roleId,
     positionId,
   } = req.body;
-  if (
-    !firstName ||
-    !lastName ||
-    !email ||
-    !password ||
-    !address ||
-    !phoneNumber ||
-    !gender ||
-    !positionId ||
-    !roleId
-  ) {
-    return res.status(200).json({
-      message: { errCode: 1, errMessage: "Missing required parameters" },
-    });
+  // if (
+  //   !firstName ||
+  //   !lastName ||
+  //   !email ||
+  //   !password ||
+  //   !address ||
+  //   !phoneNumber ||
+  //   !gender ||
+  //   !positionId ||
+  //   !roleId
+  // ) {
+  //   return res.status(200).json({
+  //     message: { errCode: 1, errMessage: "Missing required parameters" },
+  //   });
+  // }
+
+  const { error, value } = authSchema.validate(req.body, {
+    abortEarly: false,
+  });
+  if (error) {
+    console.log(error);
+    return res.send(error.details);
   }
+
+  // try {
+  //   const result = await authSchema.validateAsync(req.body);
+  //   console.log("result", result);
+  // } catch (error) {
+  //   if (error.isJoi === true) {
+  //     error.status = 422;
+  //     console.log(error);
+  //   }
+  // }
 
   let message = await userService.createNewUser(req.body);
   return res.status(200).json({
@@ -153,7 +172,8 @@ let handleLogin = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       path: "/",
-      secure: process.env.NODE_ENV === "production",
+      // secure: process.env.NODE_ENV === "production",
+      secure: process.env.NODE_ENV === "development",
       sameSite: "none",
     });
   }
