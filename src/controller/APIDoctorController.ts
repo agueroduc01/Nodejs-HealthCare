@@ -1,4 +1,4 @@
-import doctorService from "../services/doctorService";
+import doctorService from '../services/doctorService';
 let handleGetDoctorHome = async (req, res) => {
   let limit = req.query.limit;
   if (!limit) limit = 10;
@@ -9,7 +9,7 @@ let handleGetDoctorHome = async (req, res) => {
     console.log(e);
     return res.status(200).json({
       errCode: 1,
-      errMessage: "Error from Server",
+      errMessage: 'Error from Server',
     });
   }
 };
@@ -21,7 +21,7 @@ let handleGetAllDoctors = async (req, res) => {
   } catch (error) {
     return res.status(200).json({
       errCode: -1,
-      errMessage: "Error from server: " + error.message,
+      errMessage: 'Error from server: ' + error.message,
     });
   }
 };
@@ -34,7 +34,7 @@ let getDetailDoctor = async (req, res) => {
     console.error(error);
     return res.status(200).json({
       errCode: -1,
-      errMessage: "Error from server: " + error.message,
+      errMessage: 'Error from server: ' + error.message,
     });
   }
 };
@@ -47,12 +47,12 @@ let postInforDoctor = async (req, res) => {
     console.error(error);
     return res.status(200).json({
       errCode: -1,
-      errMessage: "Error from server: " + error.message,
+      errMessage: 'Error from server: ' + error.message,
     });
   }
 };
 
-module.exports = {
+export default {
   handleGetDoctorHome,
   handleGetAllDoctors,
   getDetailDoctor,

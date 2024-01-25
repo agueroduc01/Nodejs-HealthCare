@@ -1,12 +1,16 @@
-import db from "../models/index";
-import bcrypt from "bcryptjs";
+import db from '../models/index';
+import bcrypt from 'bcryptjs';
 
 const salt = bcrypt.genSaltSync(10);
 
 let handleUserLogin = (email, password) => {
   return new Promise(async (resolve, reject) => {
     try {
-      let userData = {};
+      let userData = {
+        errCode: -1,
+        errMessage: 'none',
+        user: null,
+      };
       let isExist = await checkUserEmail(email);
       if (isExist) {
         // user already exists
@@ -19,7 +23,7 @@ let handleUserLogin = (email, password) => {
           let checkPassword = await bcrypt.compareSync(password, user.password);
           if (checkPassword) {
             userData.errCode = 0;
-            userData.errMessage = "ok";
+            userData.errMessage = 'ok';
             delete user.password;
             delete user.email;
             userData.user = user;
@@ -65,7 +69,7 @@ let getAllUsers = () => {
       let users = await db.Users.findAll({
         nest: true,
         attributes: {
-          exclude: ["password"],
+          exclude: ['password'],
         },
       });
       resolve(users);
@@ -81,7 +85,7 @@ let getAUser = (idParam) => {
       let id = idParam;
       let user = await db.Users.findOne({
         where: { id: id },
-        attributes: ["email", "id", "firstName", "lastName", "address"],
+        attributes: ['email', 'id', 'firstName', 'lastName', 'address'],
         nest: true,
       });
       resolve(user);
@@ -121,7 +125,7 @@ let createNewUser = async (data) => {
       if (check === true) {
         resolve({
           errCode: 1,
-          errMessage: "Your email address is already in use. Please try again!",
+          errMessage: 'Your email address is already in use. Please try again!',
         });
       } else {
         let hashPasswordFromBcrypt = await hashUserPassword(password);
@@ -139,7 +143,7 @@ let createNewUser = async (data) => {
         });
         resolve({
           errCode: 0,
-          errMessage: "Created a new user successfully",
+          errMessage: 'Created a new user successfully',
         });
       }
     } catch (error) {
@@ -175,7 +179,7 @@ let updateUser = (data) => {
       ) {
         return resolve({
           errCode: 2,
-          errMessage: "Missing required parameter",
+          errMessage: 'Missing required parameter',
         });
       }
       // (Update)
@@ -198,12 +202,12 @@ let updateUser = (data) => {
       if (user[0] !== 0) {
         return resolve({
           errCode: 0,
-          errMessage: "Updated a user successfully!",
+          errMessage: 'Updated a user successfully!',
         });
       } else {
         return resolve({
           errCode: 1,
-          errMessage: "User not found!",
+          errMessage: 'User not found!',
         });
       }
     } catch (error) {
@@ -223,9 +227,9 @@ let deleteAUser = (idParam) => {
         },
       });
       if (check === 1) {
-        resolve("Deleted a user successfully!");
+        resolve('Deleted a user successfully!');
       } else {
-        resolve("Cannot find a user with id!");
+        resolve('Cannot find a user with id!');
       }
     } catch (error) {
       reject(error);
@@ -239,10 +243,13 @@ let getAllCodeService = (type) => {
       if (!type) {
         resolve({
           errCode: 1,
-          errMessage: "Missing required parameters!",
+          errMessage: 'Missing required parameters!',
         });
       } else {
-        let res = {};
+        let res = {
+          errCode: -1,
+          data: null,
+        };
         let allcode = await db.Allcode.findAll({
           where: { type },
         });
@@ -256,7 +263,7 @@ let getAllCodeService = (type) => {
   });
 };
 
-module.exports = {
+const userService = {
   handleUserLogin,
   getAllUsers,
   getAUser,
@@ -265,3 +272,5 @@ module.exports = {
   deleteAUser,
   getAllCodeService,
 };
+
+export default userService;

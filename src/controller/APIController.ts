@@ -1,12 +1,11 @@
-import db from "../models/index";
-import userService from "../services/userService";
+import userService from '../services/userService';
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from "../middleware/JWTAction";
-require("dotenv").config();
-import { authSchema } from "../ulti/validation_schema";
+} from '../middleware/JWTAction';
+require('dotenv').config();
+import { authSchema } from '../ulti/validation_schema';
 
 // api là 1 đường link
 // json => object
@@ -14,7 +13,7 @@ let getAllUsers = async (req, res, next) => {
   let data = await userService.getAllUsers();
 
   return res.status(200).json({
-    message: "Duke",
+    message: 'Duke',
     errCode: 0,
     data,
   });
@@ -27,7 +26,7 @@ let getAUser = async (req, res, next) => {
   if (!id) {
     return res.status(200).json({
       errCode: 1,
-      errMessage: "Missing required parameter",
+      errMessage: 'Missing required parameter',
       user: {},
     });
   }
@@ -35,7 +34,7 @@ let getAUser = async (req, res, next) => {
 
   return res.status(200).json({
     errCode: 0,
-    errMessage: "DukeUser",
+    errMessage: 'DukeUser',
     data,
   });
 };
@@ -114,7 +113,7 @@ let handlePutUser = async (req, res, next) => {
     !id
   ) {
     return res.status(200).json({
-      message: { errCode: 1, errMessage: "Missing required parameters" },
+      message: { errCode: 1, errMessage: 'Missing required parameters' },
     });
   }
 
@@ -129,7 +128,7 @@ let handleDeleteAUser = async (req, res, next) => {
   if (!id) {
     return res.status(200).json({
       errCode: 1,
-      message: "Missing required parameters",
+      message: 'Missing required parameters',
     });
   }
 
@@ -145,10 +144,11 @@ let handleLogin = async (req, res) => {
   if (!email || !password) {
     return res.status(200).json({
       errCode: 1,
-      message: "Missing inputs parameters",
+      message: 'Missing inputs parameters',
     });
   }
-  let userData = await userService.handleUserLogin(email, password);
+  let userData: any = {};
+  userData = await userService.handleUserLogin(email, password);
   /**
    * Authentication(xác thực):
    * - check email exist
@@ -158,7 +158,7 @@ let handleLogin = async (req, res) => {
   // Authorization(ủy quyền) : access token: JWT
   let accessToken = null;
   let refreshToken = null;
-  if (userData && userData.errCode === 0 && userData.errMessage === "ok") {
+  if (userData && userData.errCode === 0 && userData.errMessage === 'ok') {
     let payload = {
       id: `${userData.user.id}`,
       name: `${userData.user.firstName} ${userData.user.lastName}`,
@@ -169,12 +169,12 @@ let handleLogin = async (req, res) => {
     refreshToken = generateRefreshToken(payload);
 
     // Nếu dùng REDIS thì bỏ res.cookie
-    res.cookie("refreshToken", refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      path: "/",
+      path: '/',
       // secure: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "development",
-      sameSite: "none",
+      secure: process.env.NODE_ENV === 'development',
+      sameSite: 'none',
     });
   }
   return res.status(200).json({
@@ -189,10 +189,10 @@ let handleGetAllCode = async (req, res) => {
     let data = await userService.getAllCodeService(req.query.type);
     return res.status(200).json(data);
   } catch (error) {
-    console.error(">>Get all code server error: ", error);
+    console.error('>>Get all code server error: ', error);
     return res.status(200).json({
       errCode: -1,
-      errMessage: "Error from server",
+      errMessage: 'Error from server',
     });
   }
 };
@@ -206,7 +206,7 @@ let requestRefreshToken = async (req, res) => {
   // if (!refreshTokens.includes(refreshToken))
   //   return res.status(403).json("Refresh token is not available");
   try {
-    let data = verifyRefreshToken(refreshToken);
+    let data: any = verifyRefreshToken(refreshToken);
     // Lọc (loại bỏ) refreshToken trong REDIS mà user vừa gửi request đến
     // refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
     data = {
@@ -220,26 +220,26 @@ let requestRefreshToken = async (req, res) => {
     // Thêm refreshToken mới vào REDIS
     // refreshTokens.push(newRefreshToken);
     return res
-      .cookie("refreshToken", newRefreshToken, {
+      .cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
         // secure: false,
-        secure: process.env.NODE_ENV === "production",
-        path: "/",
-        sameSite: "none",
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        sameSite: 'none',
       })
       .status(200)
       .json({
         accessToken: newAccessToken,
       });
   } catch (error) {
-    return res.status(403).json("NOT FORBIDDEN!");
+    return res.status(403).json('NOT FORBIDDEN!');
   }
 };
 
 let handleLogout = async (req, res) => {
   try {
     // Lọc (loại bỏ) refreshToken trong REDIS mà user vừa gửi request đến
-    res.clearCookie("refreshToken");
+    res.clearCookie('refreshToken');
     // const { refreshToken } = req.body;
     // if (!refreshToken) return res.status(401).json("You're not authenticated");
     // const data = verifyRefreshToken(refreshToken);
@@ -259,14 +259,14 @@ let handleLogout = async (req, res) => {
     // errMessage: "Logout!"
     // })
     // })
-    return res.status(200).json("Logged out !");
+    return res.status(200).json('Logged out !');
   } catch (error) {
-    console.log("error from logged out", error);
+    console.log('error from logged out', error);
     return res.status(500).json(`${error.message}`);
   }
 };
 
-module.exports = {
+export default {
   getAllUsers,
   getAUser,
   handlecreateNewUser,

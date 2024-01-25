@@ -1,15 +1,18 @@
-"use strict";
-require("dotenv").config();
+'use strict';
+require('dotenv').config();
 
-const fs = require("fs");
-const path = require("path");
-const Sequelize = require("sequelize");
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || "development";
-const config = require(__dirname + "/../config/config.json")[env];
-const db = {};
+const env = process.env.NODE_ENV || 'development';
+const config = require(__dirname + '/../config/config.json')[env];
+const db = {
+  sequelize: null,
+  Sequelize: null,
+};
 
-let sequelize;
+let sequelize: any = null;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
@@ -24,7 +27,7 @@ if (config.use_env_variable) {
 fs.readdirSync(__dirname)
   .filter((file) => {
     return (
-      file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+      file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js'
     );
   })
   .forEach((file) => {
@@ -44,4 +47,4 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-module.exports = db;
+export default db;

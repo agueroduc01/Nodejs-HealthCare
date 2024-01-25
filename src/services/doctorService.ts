@@ -166,7 +166,7 @@ let saveDetailInforDoctor = (inputData) => {
   });
 };
 
-module.exports = {
+export default {
   getDoctorHome,
   getAllDoctors,
   getDetailDoctorById,

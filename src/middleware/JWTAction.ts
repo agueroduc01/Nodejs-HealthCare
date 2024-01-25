@@ -123,7 +123,7 @@ let checkAdmin = (req, res, next) => {
   }
 };
 
-module.exports = {
+export {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,

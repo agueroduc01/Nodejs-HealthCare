@@ -16,6 +16,4 @@ const authSchema = Joi.object({
   image: Joi.string().lowercase(),
 });
 
-module.exports = {
-  authSchema,
-};
+export { authSchema };

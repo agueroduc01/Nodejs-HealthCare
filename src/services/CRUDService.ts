@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs";
-import db from "../models/index";
-import UserDTO from "../DTO/UserDTO";
+import bcrypt from 'bcryptjs';
+import db from '../models/index';
+import UserDTO from '../DTO/UserDTO';
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -26,10 +26,10 @@ let createNewUser = async (data) => {
         password: hashPasswordFromBcrypt,
         address,
         phoneNumber,
-        gender: gender === "1" ? true : false,
+        gender: gender === '1' ? true : false,
         roleId,
       });
-      resolve("Created a new user successfully");
+      resolve('Created a new user successfully');
     } catch (error) {
       reject(error);
     }
@@ -67,7 +67,7 @@ let getAUser = (idParam) => {
       let id = idParam;
       let user = await db.Users.findOne({
         where: { id: id },
-        attributes: ["email", "id", "firstName", "lastName", "address"],
+        attributes: ['email', 'id', 'firstName', 'lastName', 'address'],
         raw: true,
         nest: true,
       });
@@ -96,7 +96,7 @@ let updateUser = (data) => {
           nest: true,
         }
       );
-      resolve("Updated a user successfully!");
+      resolve('Updated a user successfully!');
     } catch (error) {
       reject(error);
     }
@@ -113,14 +113,14 @@ let deleteAUser = (idParam) => {
           id,
         },
       });
-      resolve("Deleted a user successfully!");
+      resolve('Deleted a user successfully!');
     } catch (error) {
       reject(error);
     }
   });
 };
 
-module.exports = {
+export default {
   createNewUser,
   getAllUsers,
   getAUser,
