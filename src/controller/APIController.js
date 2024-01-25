@@ -147,7 +147,7 @@ let handleLogin = async (req, res) => {
       message: 'Missing inputs parameters',
     });
   }
-  let userData: any = {};
+  let userData = {};
   userData = await userService.handleUserLogin(email, password);
   /**
    * Authentication(xác thực):
@@ -206,7 +206,7 @@ let requestRefreshToken = async (req, res) => {
   // if (!refreshTokens.includes(refreshToken))
   //   return res.status(403).json("Refresh token is not available");
   try {
-    let data: any = verifyRefreshToken(refreshToken);
+    let data = verifyRefreshToken(refreshToken);
     // Lọc (loại bỏ) refreshToken trong REDIS mà user vừa gửi request đến
     // refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
     data = {

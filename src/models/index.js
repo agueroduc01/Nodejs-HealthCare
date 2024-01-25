@@ -8,11 +8,11 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 const db = {
-  sequelize: null,
-  Sequelize: null,
+  // sequelize: null,
+  // Sequelize: null,
 };
 
-let sequelize: any = null;
+let sequelize = null;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {

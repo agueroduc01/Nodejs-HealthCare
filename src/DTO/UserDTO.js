@@ -1,14 +1,14 @@
 export default class UserDTO {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  address: string;
-  phoneNumber: string;
-  gender: string;
-  image: string;
-  roleId: string;
-  positionId: string;
+  email;
+  password;
+  firstName;
+  lastName;
+  address;
+  phoneNumber;
+  gender;
+  image;
+  roleId;
+  positionId;
 
   constructor(data) {
     this.email = data.email;
